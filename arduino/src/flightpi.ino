@@ -48,6 +48,9 @@ uint32_t getColor(char val) {
     case 'W': return pixel_liv.Color(255, 255, 255);
     case 'Y': return pixel_liv.Color(255, 255, 0  );
     case 'O': return pixel_liv.Color(255, 128, 0  );
+    case 'P': return pixel_liv.Color(128, 0  , 128); // purple
+    case 'I': return pixel_liv.Color(255, 20 , 147); // pink
+    case 'G': return pixel_liv.Color(212, 175, 55); // gold
     case 'N':
     default:
       return pixel_liv.Color(0,0,0);
@@ -150,7 +153,7 @@ void setAltitude(int level, char climb) {
   Serial.print(climb);
   Serial.print(", Pixels: ");
   Serial.println(pixels);
-          
+
   if(pixels>pixel_alt.numPixels()) { pixels = pixel_alt.numPixels(); }
 
   uint32_t col;
