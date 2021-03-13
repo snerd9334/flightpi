@@ -79,7 +79,7 @@ class SbsThread(threading.Thread):
 
             while not data in self.buff and not self.stopping:
                 try:
-                    recv = self.socket.recv(1024)
+                    recv = self.socket.recv(1024).decode()
                     if not recv:
                         log.error("Socket has been closed, will attempt reconnecting")
                         self.socket = None

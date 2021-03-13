@@ -28,33 +28,36 @@ class ArduinoThread(threading.Thread):
     def processFlight(self, flight):
         """ Take the given flight details, translate it into what we want to show on the LCD """
         if(flight is None):
-            self.device.write("C\n")
+            self.device.write(b"C\n")
             self.device.flush()
             self.display = None
         else:
             if(self.display is not None and self.display['callsign'] != flight['callsign']):
                 # We're getting a new flight, so clear the current display
-                self.device.write("C\n")
+                self.device.write(b"C\n")
                 self.device.flush()
 
             self.display = flight
 
             climb = "L"
             if(flight['verticalRate'] is not None):
-                if(int(flight['verticalRate'])>100): climb = "C"
-                if(int(flight['verticalRate'])<-100): climb = "D"
+                if(int(flight['verticalRate']))>100: climb = "C"
+                if(int(flight['verticalRate']))<-100: climb = "D"
 
             if(flight['track'] is not None):
-                self.device.write("D%s\n" % (flight['track']))
-    
+                track = ("D%s\n" % (flight['track'])).encode()
+                self.device.write(track)
+
             if(flight['altitude'] is not None):
-                self.device.write("A%s%s\n" % (climb,flight['altitude']))
-    
+                alt = ("A%s%s\n" % (climb,flight['altitude'])).encode()
+                self.device.write(alt)
+
             if flight['callsign'][:3] in FlightColours.col:
-                self.device.write("L%s\n" % (FlightColours.col[flight['callsign'][:3]]))
+                csign = ("L%s\n" % (FlightColours.col[flight['callsign'][:3]])).encode()
+                self.device.write(csign)
             else:
                 # Blank the LEDs if we don't have a specified livery
-                self.device.write("LNNN\n")
+                self.device.write(b"LNNN\n")
 
             self.device.flush()
 
@@ -69,7 +72,7 @@ class ArduinoThread(threading.Thread):
         while not self.stopping:
             time.sleep(1)
 
-        self.device.write("C\n")
+        self.device.write(b"C\n")
         self.device.close()
 
         log.info("ArduinoThread shut down")

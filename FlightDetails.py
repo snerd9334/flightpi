@@ -18,7 +18,8 @@ import logging
 import sys
 import sqlite3
 import time
-import urllib2
+
+from urllib.request import urlopen
 
 log = logging.getLogger('root')
 TIMEOUT=60 # Number of minutes to keep a cache of our API hits
@@ -44,11 +45,9 @@ class FlightDetails:
                     return None
             try:
                 log.debug("Attempting to fetch details from external API")
-                req = urllib2.Request("https://api.joshdouch.me/hex-type.php?hex=%s" % (icao), headers={ 'User-Agent': 'Mozilla/5.0' })
-                type = urllib2.urlopen(req).read()
+                type = urlopen("https://api.joshdouch.me/hex-type.php?hex=%s" % (icao))
+                reg = urlopen("https://api.joshdouch.me/hex-reg.php?hex=%s" % (icao))
 
-                req = urllib2.Request("https://api.joshdouch.me/hex-reg.php?hex=%s" % (icao), headers={ 'User-Agent': 'Mozilla/5.0' })
-                reg = urllib2.urlopen(req).read()
 
                 if type=="n/a" or type=="0": type=None
                 if reg=="n/a" or reg=="0": reg=None
@@ -57,7 +56,7 @@ class FlightDetails:
 
                 if type is not None and reg is not None:
                     log.info("Successful fetch for %s, now inserting into database" % (icao))
-                    self.c.execute("INSERT INTO `airframe` (icao, type, registration) VALUES (?, ? ,?)", [icao, type, reg])
+                    self.c.execute("INSERT INTO `airframe` (icao, type, registration) VALUES (?, ? ,?)", [str(icao), str(type), str(reg)])
                     self.conn.commit()
                     row = (icao, type, reg)
 

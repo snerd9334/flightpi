@@ -47,7 +47,7 @@ class FlightPi:
         self.addReceiver(self.arduinoThread.processFlight)
         self.arduinoThread.start()
 
-        self.sbsThread = SbsThread("mercury",30003)
+        self.sbsThread = SbsThread('192.168.1.55',30003) #specify server for SBS messages
         self.sbsThread.addReceiver(self.processMessage)
         self.sbsThread.start()
 
@@ -57,7 +57,7 @@ class FlightPi:
                 time.sleep(1)
                 self.updateAircraft()
         except (KeyboardInterrupt, SystemExit):
-            log.warn("Interrupted, shutting down")
+            log.warning("Interrupted, shutting down")
 
         self.arduinoThread.stop()
         self.sbsThread.stop()
