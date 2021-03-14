@@ -41,8 +41,8 @@ class ArduinoThread(threading.Thread):
 
             climb = "L"
             if(flight['verticalRate'] is not None):
-                if(int(flight['verticalRate']))>100: climb = "C"
-                if(int(flight['verticalRate']))<-100: climb = "D"
+                if(int(flight['verticalRate']))>250: climb = "C"
+                if(int(flight['verticalRate']))<-250: climb = "D"
 
             if(flight['track'] is not None):
                 track = ("D%s\n" % (flight['track'])).encode()
