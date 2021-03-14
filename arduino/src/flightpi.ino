@@ -6,6 +6,8 @@ Matt Dyson
 24/01/18
 
 Part of FlightPi - http://github.com/mattdy/flightpi
+
+Updated by snerd9334 March 2021
 */
 
 #include <Adafruit_NeoPixel.h>
@@ -13,15 +15,15 @@ Part of FlightPi - http://github.com/mattdy/flightpi
   #include <avr/power.h>
 #endif
 
-#define BRIGHTNESS 50
+#define BRIGHTNESS 15
 
 Adafruit_NeoPixel pixel_dir = Adafruit_NeoPixel(16, 2, NEO_GRBW + NEO_KHZ800);
 Adafruit_NeoPixel pixel_liv = Adafruit_NeoPixel(24, 3, NEO_GRBW + NEO_KHZ800);
 Adafruit_NeoPixel pixel_alt = Adafruit_NeoPixel(16, 4, NEO_GRB + NEO_KHZ800);
 
 // The actual bulbs aren't in a nice order, so set up arrays to determine which order to light them up in
-int dirBulbs[] = { 6,5,4,3,2,1,0,15,14,13,12,11,10,9,8,7 };
-int altBulbs[] = { 7,15,6,14,5,13,4,12,3,11,2,10,1,9,0,8 };
+int dirBulbs[] = { 0,15,14,13,12,11,10,9,8,7,6,5,4,3,2,1 };
+int altBulbs[] = { 0,1,2,3,4,5,6,7,15,14,13,12,11,10,9,8 };
 
 void setup() {
   Serial.begin(9600);
@@ -50,7 +52,6 @@ uint32_t getColor(char val) {
     case 'O': return pixel_liv.Color(255, 128, 0  );
     case 'P': return pixel_liv.Color(128, 0  , 128); // purple
     case 'I': return pixel_liv.Color(255, 20 , 147); // pink
-    case 'G': return pixel_liv.Color(212, 175, 55); // gold
     case 'N':
     default:
       return pixel_liv.Color(0,0,0);
@@ -98,7 +99,7 @@ void setLivery(String colours) {
 
 void setDirection(int direction) {
   int position = direction / 22.5; // Position of our main direction LED
-  int trail = 3; // Length of faded trail either side
+  int trail = 1; // Length of faded trail either side
 
   // First, clear every pixel
   for(uint16_t i=0; i<pixel_dir.numPixels(); i++) {
@@ -125,7 +126,7 @@ void setDirection(int direction) {
     }
 
     int div = i - trail;
-    float intensity = (float) 1 / (1 + abs(div));
+    float intensity = (float) 1 / (10 + abs(div));
     int col = intensity * 255;
 
     Serial.print("Pixel ");
@@ -138,14 +139,22 @@ void setDirection(int direction) {
     Serial.println(div);
 
     pixel_dir.setPixelColor(dirBulbs[bulb], pixel_dir.Color(0,0,col));
-  }
 
+  }
+  pixel_dir.setPixelColor(dirBulbs[start+trail], pixel_dir.Color(0,150,0));
   pixel_dir.show();
 
 }
 
 void setAltitude(int level, char climb) {
-  int pixels = level / 500; // One LED per 500ft
+
+  int pixels;
+
+  if (level < 2500) {
+  pixels = level / 150; // One LED per 150ft for aircraft lower than 2500ft
+  }  else {
+  pixels = level / 2500; // One LED per 2500ft
+  }
 
   Serial.print("Altitude: ");
   Serial.print(level);
@@ -170,6 +179,10 @@ void setAltitude(int level, char climb) {
     default:
       col = pixel_alt.Color(0,0,255);
     break;
+  }
+
+  if (level < 2500){
+    col = pixel_alt.Color(0,255,255);  //cyan for aircraft under 2500ft
   }
 
   for(uint16_t i=0; i<pixel_alt.numPixels(); i++) {
