@@ -25,6 +25,7 @@ from SbsThread import SbsThread
 from LcdThread import LcdThread
 from ArduinoThread import ArduinoThread
 import time
+import schedule
 
 class FlightPi:
     def __init__(self):
@@ -52,10 +53,12 @@ class FlightPi:
         self.sbsThread.start()
 
         log.info("Starting loop")
+        schedule.every().day.at("22:00").do(self.stop) #stops at 10pm
         try:
             while(self.stopping is False):
                 time.sleep(1)
                 self.updateAircraft()
+                schedule.run_pending()
         except (KeyboardInterrupt, SystemExit):
             log.warning("Interrupted, shutting down")
 
