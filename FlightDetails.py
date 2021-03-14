@@ -18,8 +18,7 @@ import logging
 import sys
 import sqlite3
 import time
-
-from urllib.request import urlopen
+import urllib.request
 
 log = logging.getLogger('root')
 TIMEOUT=60 # Number of minutes to keep a cache of our API hits
@@ -45,8 +44,10 @@ class FlightDetails:
                     return None
             try:
                 log.debug("Attempting to fetch details from external API")
-                type = urlopen("https://api.joshdouch.me/hex-type.php?hex=%s" % (icao))
-                reg = urlopen("https://api.joshdouch.me/hex-reg.php?hex=%s" % (icao))
+                with urllib.request.urlopen("https://api.joshdouch.me/hex-type.php?hex=%s" % (icao)) as response:
+                    type = response.read()
+                with urllib.request.urlopen("https://api.joshdouch.me/hex-reg.php?hex=%s" % (icao)) as response:
+                    reg = response.read()
 
 
                 if type=="n/a" or type=="0": type=None
