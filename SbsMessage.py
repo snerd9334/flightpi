@@ -32,7 +32,7 @@ class SbsMessage:
         self.icao24 = self.getPart(4)
         self.flightID = self.getPart(5)
         self.callsign = self.getPart(10)
-        self.altitude = self.getPart(11)
+        self.altitude = self.getint(11)
         self.groundSpeed = self.getPart(12)
         self.track = self.getPart(13)
         self.verticalRate = self.getPart(16)
@@ -40,5 +40,11 @@ class SbsMessage:
 
     def getPart(self, index):
         fetch = self.parts[index].strip()
+        if(fetch==''): return None
+        return fetch
+
+    def getint(self,index):
+        fetch = self.parts[index].strip()
+        fetch = int(fetch)
         if(fetch==''): return None
         return fetch
