@@ -9,6 +9,10 @@ Matt Dyson
 
 Part of FlightPi - http://github.com/mattdy/flightpi
 """
+import logging
+
+log = logging.getLogger('root')
+
 class SbsMessageType:
     ES_IDENT_AND_CATEGORY = 1
     ES_SURFACE_POS = 2
@@ -37,6 +41,8 @@ class SbsMessage:
         self.track = self.getPart(13)
         self.verticalRate = self.getPart(16)
         self.squawk = self.getPart(17)
+
+    #    log.info(self.squawk) # for viewing parts of messages
 
     def getPart(self, index):
         fetch = self.parts[index].strip()
