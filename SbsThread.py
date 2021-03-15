@@ -36,8 +36,6 @@ class SbsThread(threading.Thread):
             self.socket.settimeout(5) # Timeout after 5s to avoid blocking for a long time if no messages
             self.socket.connect((self.host, self.port))
 
-            self.socket.send("")
-
             log.info("Connection complete")
         except Exception as e:
             log.error("Error connecting", e)
