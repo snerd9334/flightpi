@@ -11,10 +11,10 @@ import logging
 import sys
 
 log = logging.getLogger('root')
-log.setLevel(logging.DEBUG)
+log.setLevel(logging.INFO)
 
 stream = logging.StreamHandler(sys.stdout)
-stream.setLevel(logging.DEBUG)
+stream.setLevel(logging.INFO)
 
 formatter = logging.Formatter('[%(asctime)s] %(levelname)8s %(module)15s: %(message)s')
 stream.setFormatter(formatter)
@@ -40,7 +40,7 @@ class FlightPi:
     def execute(self):
         log.info("Starting up FlightPi")
 
-        self.lcdThread = LcdThread(0x20,20)
+        self.lcdThread = LcdThread(0x27,20)
         self.addReceiver(self.lcdThread.processFlight)
         self.lcdThread.start()
 
