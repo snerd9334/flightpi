@@ -36,7 +36,7 @@ E_PULSE = 0.0005
 E_DELAY = 0.0005
 
 class LcdThread(threading.Thread):
-    def __init__(self, address=0x20, width=20):
+    def __init__(self, address=0x27, width=20):
         threading.Thread.__init__(self)
         self.stopping = False
 
@@ -60,7 +60,7 @@ class LcdThread(threading.Thread):
         }
 
         if(flight is not None):
-            type = self.data.getType(flight['icao24'])
+            type = self.data.getType(flight['icao24'])[2:-1]
             if type is None: type=""
 
             speed = flight['groundSpeed']
@@ -80,11 +80,30 @@ class LcdThread(threading.Thread):
             if(squawk is None):
                 squawk = ""
 
+            track = str(flight['track'])
+            if(len(track) == 2):
+                track = "0" + track
+            elif(len(track) == 1):
+                track = "00" + track
+
+            sqwLine = ""
+            if(flight['track'] is not None):
+                sqwLine = "Trk:" + track
+                # Pad out line with appropriate number of spaces
+                sqwLine = sqwLine.ljust(self.width - len(squawk))
+                sqwLine += squawk
+
+            callsign = flight['callsign']
+            if (callsign[0] == "G"):
+                callsignG = callsign[0] + "-" + callsign[1:5]
+            else:
+                callsignG = callsign
+
             lines = {
-                LCD_LINE_1: '{}'.format(flight['callsign'].center(self.width)),
+                LCD_LINE_1: '{}'.format(callsignG.center(self.width)),
                 LCD_LINE_2: altLine,
                 LCD_LINE_3: '{}'.format(type.center(self.width)),
-                LCD_LINE_4: '{}'.format(squawk.center(self.width))
+                LCD_LINE_4: sqwLine
             }
             self.backlight = LCD_BACKLIGHT_ON
         else:
@@ -96,13 +115,13 @@ class LcdThread(threading.Thread):
     def getLevel(self, level):
         """ Turn a given level into an altitude or flight level display accordingly """
         if int(level)<6000: # Transition level
-            return "A{}".format(int(level)/100)
+            return "{}ft".format(int(level))
         else:
-            return "FL{}".format(int(level)/100)
+            return "FL{}".format(round(int(level)/100))
 
     def __lcd_write(self, bits, mode):
         """ Send byte to data pins on the LCD """
-    
+
         # bits = the data
         # mode = 1 for data
         #        0 for command
@@ -136,6 +155,7 @@ class LcdThread(threading.Thread):
 
     def stop(self):
         self.stopping = True
+        self.backlight = LCD_BACKLIGHT_OFF
 
     def run(self):
         log.info("LcdThread starting")
