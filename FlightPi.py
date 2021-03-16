@@ -9,6 +9,7 @@ Part of FlightPi - http://github.com/mattdy/flightpi
 """
 import logging
 import sys
+import os
 
 log = logging.getLogger('root')
 log.setLevel(logging.INFO)
@@ -33,6 +34,9 @@ class FlightPi:
         self.aircraft = { }
         self.receivers = [ ]
         self.display = None
+        log.info("Starting up VPN in 1 minute")
+        time.sleep(60)
+        os.system("sudo service openvpn restart")
 
     def stop(self):
         self.stopping = True
