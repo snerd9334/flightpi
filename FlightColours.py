@@ -51,4 +51,9 @@ class FlightColours:
         "AFL" : "WBR",
         "FDX" : "POW",
         "PGT" : "WRO",
+        "CWL" : "BWR",
+        "BKH" : "BWR",
+        "AWC" : "NOW",
+        "NPT" : "BRY",
+        "SFC" : "BWB",
     }
