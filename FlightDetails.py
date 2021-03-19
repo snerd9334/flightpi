@@ -24,7 +24,7 @@ log = logging.getLogger('root')
 TIMEOUT=60 # Number of minutes to keep a cache of our API hits
 
 class FlightDetails:
-    def __init__(self,filename="details.sql"):
+    def __init__(self,filename="/home/pi/flightpi/details.sql"):
         log.debug("Starting FlightDetails database at %s" % (filename))
         self.apiCache = { }
 
