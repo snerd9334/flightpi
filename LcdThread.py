@@ -43,7 +43,7 @@ class LcdThread(threading.Thread):
         self.display = None
         self.backlight = LCD_BACKLIGHT_OFF
 
-        self.bus = smbus.SMBus(1) #I2C interface
+        self.bus = smbus.SMBus(3) #I2C interface
 
         self.address = address
         self.width = width
