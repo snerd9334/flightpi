@@ -146,32 +146,56 @@ class LcdThread(threading.Thread):
 
     def __lcd_line(self, message, line):
         """ Send message to display on given line """
-        message = message.ljust(self.width," ")
-
-        self.__lcd_write(line, LCD_CMD)
-
-        for i in range(self.width):
-            self.__lcd_write(ord(message[i]),LCD_CHR)
-
-    def stop(self):
-        self.stopping = True
-        self.backlight = LCD_BACKLIGHT_OFF
+        if len(message) > self.width:
+            # Pad the message with an additional character to simulate scrolling
+            message += ' '
+            for i in range(len(message)-self.width+1):
+                # Display a sliding window of the message with the length of self.width
+                display_message = message[i:i+self.width]
+                self.__lcd_write(line, LCD_CMD)
+                for char in display_message:
+                    self.__lcd_write(ord(char), LCD_CHR)
+                time.sleep(0.4)
+        else:
+            # Pad the message with spaces to fill the line
+            message = message.ljust(self.width)
+            self.__lcd_write(line, LCD_CMD)
+            for char in message:
+                self.__lcd_write(ord(char), LCD_CHR)
 
     def run(self):
-        log.info("LcdThread starting")
-
-        # Initialise display
-        self.__lcd_write(0x33, LCD_CMD) # 110011 Initialise
-        self.__lcd_write(0x32, LCD_CMD) # 110010 Initialise
-        self.__lcd_write(0x06, LCD_CMD) # 000110 Cursor move direction
-        self.__lcd_write(0x0C, LCD_CMD) # 001100 Display On,Cursor Off, Blink Off
-        self.__lcd_write(0x28, LCD_CMD) # 101000 Data length, number of lines, font size
-        self.__lcd_write(0x01, LCD_CMD) # 000001 Clear display
-        time.sleep(E_DELAY)
+        """ Runs the thread """
+        log.info('LCD Thread started')
+        self.__lcd_init()
 
         while not self.stopping:
-            # Updating logic done through processMessage, so nothing to do here
-            time.sleep(1)
+            flight = self.data.getCurrentFlight()
+            self.processFlight(flight)
 
-        self.__lcd_write(0x01, LCD_CMD)
-        log.info("LcdThread shut down")
+            time.sleep(5)
+
+        self.__lcd_write(LCD_LINE_1, LCD_CMD)
+        self.__lcd_line('Goodbye!', LCD_LINE_1)
+        time.sleep(1)
+        self.__lcd_backlight(LCD_BACKLIGHT_OFF)
+        log.info('LCD Thread stopped')
+
+    def stop(self):
+        """ Stops the thread """
+        self.stopping = True
+
+    def __lcd_backlight(self, state):
+        """ Turn the backlight on or off """
+        self.backlight = state
+        self.__lcd_write(0x00, LCD_CMD)
+
+    def __lcd_init(self):
+        """ Initialise the display """
+        self.__lcd_write(0x33,LCD_CMD) # 110011 Initialise
+        self.__lcd_write(0x32,LCD_CMD) # 110010 Initialise
+        self.__lcd_write(0x06,LCD_CMD) # 000110 Cursor move direction
+        self.__lcd_write(0x0C,LCD_CMD) # 001100 Display On,Cursor Off, Blink Off
+        self.__lcd_write(0x28,LCD_CMD) # 101000 Data length, number of lines, font size
+        self.__lcd_write(0x01,LCD_CMD) # 000001 Clear display
+        time.sleep(E_DELAY)
+
