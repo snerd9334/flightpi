@@ -1,12 +1,9 @@
 """
 LcdThread.py
 Accepts details of a flight to display, and outputs them to an LCD
-
 Inspiration taken from https://www.raspberrypi-spy.co.uk/2015/05/using-an-i2c-enabled-lcd-screen-with-the-raspberry-pi/
-
 Matt Dyson
 13/02/18
-
 Part of FlightPi - http://github.com/mattdy/flightpi
 """
 import threading
@@ -169,8 +166,8 @@ class LcdThread(threading.Thread):
         self.__lcd_init()
 
         while not self.stopping:
-            flight = self.data.getCurrentFlight()
-            self.processFlight(flight)
+#            flight = self.data.getFlight() - not needed
+#            self.processFlight(flight)  - not needed
 
             time.sleep(5)
 
@@ -183,6 +180,10 @@ class LcdThread(threading.Thread):
     def stop(self):
         """ Stops the thread """
         self.stopping = True
+         # Turn off the backlight when stopping the thread
+        self.backlight = LCD_BACKLIGHT_OFF
+        self.__lcd_write(0x01, LCD_CMD)  # Clear display
+        log.info("Stopping")                                                                                                            
 
     def __lcd_backlight(self, state):
         """ Turn the backlight on or off """
@@ -198,4 +199,3 @@ class LcdThread(threading.Thread):
         self.__lcd_write(0x28,LCD_CMD) # 101000 Data length, number of lines, font size
         self.__lcd_write(0x01,LCD_CMD) # 000001 Clear display
         time.sleep(E_DELAY)
-
