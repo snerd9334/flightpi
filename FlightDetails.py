@@ -3,15 +3,8 @@ FlightDetails.py
 
 Manage the database of known ICAO24 decodes, fetch from external APIs as needed
 
-Thanks to 'joshuadouch' for the API - https://radarspotting.com/forum/index.php?topic=6117.0
+Updated API URLs to https://hexdb.io/
 
-Matt Dyson
-08/06/18
-
-Part of FlightPi - http://github.com/mattdy/flightpi
-
-
-Updated API URL's as per update to forum post listed above. With help from https://github.com/GalaxyTheoryz/flightpi/blob/33f0e4729ee9cc15891b992310b0c9cecbbb68ac/FlightDetails.py
 """
 
 import logging
@@ -44,9 +37,9 @@ class FlightDetails:
                     return None
             try:
                 log.debug("Attempting to fetch details from external API")
-                with urllib.request.urlopen("https://api.joshdouch.me/hex-type.php?hex=%s" % (icao)) as response:
+                with urllib.request.urlopen("https://hexdb.io/hex-type?hex=%s" % (icao)) as response:
                     type = response.read()
-                with urllib.request.urlopen("https://api.joshdouch.me/hex-reg.php?hex=%s" % (icao)) as response:
+                with urllib.request.urlopen("https://hexdb.io/hex-reg?hex=%s" % (icao)) as response:
                     reg = response.read()
 
 
